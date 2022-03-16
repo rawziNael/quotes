@@ -4,20 +4,62 @@
 package quotes;
 import com.google.gson.Gson;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class App {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+
+//        Gson gson = new Gson();
+//        String jsonFile = readJson();
+//        Quote[] read = gson.fromJson(jsonFile, Quote[].class);
+//        int randNum = (int)(Math.random()*read.length);
+//        System.out.println(read[randNum]);
+
+        //**************************************lab09****************************************************
 
         Gson gson = new Gson();
-        String jsonFile = readJson();
-        Quote[] read = gson.fromJson(jsonFile, Quote[].class);
-        int randNum = (int)(Math.random()*read.length);
-        System.out.println(read[randNum]);
+        QuoteAPI[] apiQuote = gson.fromJson(getAPIQuoteInternet(), QuoteAPI[].class);
+        saveQuote(apiQuote);
     }
+
+    //*********************************************lab09**************************************************
+
+    // Gets a random quotes from the Formismatic API
+    public static String getAPIQuoteInternet() throws IOException {
+
+        // 1-Request setup:
+        URL url = new URL("http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+
+        // 2-Saves response as a string:
+        BufferedReader response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String str = response.readLine();
+
+        // 3-close the connection:
+        response.close();
+        connection.disconnect();
+        return str;
+    }
+
+    public static void saveQuote(QuoteAPI[] newQuote) {
+        BufferedWriter writer;
+        try {
+            Gson gson = new Gson();
+            String newStr = gson.toJson(newQuote);
+            writer = new BufferedWriter(new FileWriter("app/src/main/resources/ recentquotes.json", true));
+            writer.newLine();
+            writer.append(newStr);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //************************************************************************************************
 
     public static String readJson() {
         String lines = "";
