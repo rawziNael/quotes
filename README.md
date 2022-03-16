@@ -1,4 +1,4 @@
-# quotes  
+# Quotes  
 The code read json file then convert it to object using GSON package then we can manipulate the data using java.  
 
 ##### Using Gson package
